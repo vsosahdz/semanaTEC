@@ -7,9 +7,10 @@ from joblib import load
 import numpy as np
 import os
 
+#Cargar el modelo
+dt = load('modelo.joblib')
 
 #Generar el servidor (Back-end)
-
 servidorWeb = Flask(__name__)
 
 #Anotación
@@ -23,7 +24,18 @@ def modeloForm():
     #Procesar datos de entrada
     contenido = request.form
     print(contenido)
-    return jsonify({"Resultado":"datos recibidos"})    
+
+    datosEntrada = np.array([
+        9.0000,0.4500,0.4900,2.6000,0.0840,21.0000,75.0000,0.9987,
+        contenido['pH'],
+        contenido['sulfatos'],
+        contenido['alcohol']
+    ])
+    #Utilizar el modelo
+    resultado=dt.predict(datosEntrada.reshape(1,-1))
+
+
+    return jsonify({"Resultado":str(resultado[0])})    
 
 #Procesar datos de un archivo
 @servidorWeb.route('/modeloFile',methods=['POST'])
